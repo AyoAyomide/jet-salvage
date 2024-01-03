@@ -10,25 +10,33 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Rigidbody rb;
 
     private Vector3 jetDirection;
-    private void Start(){
+    private void Start()
+    {
 
     }
 
-    private void Update(){
+    private void Update()
+    {
 
         MoveForward();
 
-        VarticalControle();
+        VerticalControl();
+    }
 
+    void FixedUpdate()
+    {
+        // Apply force to the rigid body in FixedUpdate
         rb.AddForce(jetDirection);
     }
 
-    private void MoveForward(){
-        if(jetDirection.z < 30)
-         jetDirection.z += forwardSpeed * Time.deltaTime;
+    private void MoveForward()
+    {
+        if (jetDirection.z < 30)
+            jetDirection.z += forwardSpeed * Time.deltaTime;
     }
 
-    private void VarticalControle(){
+    private void VerticalControl()
+    {
         // Get vertical input
         float verticalInput = Input.GetAxis("Horizontal");
 
