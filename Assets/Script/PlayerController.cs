@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float acceleration;
     [SerializeField] float turnSpeed;
     [SerializeField] Transform jetModelGOB;
+    [SerializeField] Vector3 groundOffset;
 
     private Rigidbody rb;
 
@@ -20,31 +21,60 @@ public class PlayerController : MonoBehaviour
 
     private Vector3 startModelOffset;
 
-    private void Start() {
+    private void Start()
+    {
 
         rb = gameObject.GetComponent<Rigidbody>();
         startModelOffset = jetModelGOB.transform.localPosition;
     }
-    
-    private void Update() {
 
-        curYRot += horizontalInput * turnSpeed * Time.deltaTime;
-        //jetModelGOB.position = transform.position + startModelOffset;
-        jetModelGOB.eulerAngles = new Vector3(0,curYRot,0);
+    private void Update()
+    {
+
+        float turnRate = Vector3.Dot(rb.velocity.normalized, jetModelGOB.forward);
+        turnRate = Mathf.Abs(turnRate);
+
+        curYRot += horizontalInput * turnSpeed * turnRate * Time.deltaTime;
+        jetModelGOB.position = transform.position + startModelOffset;
+        //jetModelGOB.eulerAngles = new Vector3(0, curYRot, 0);
+
+        StickToGround();
+
 
         HorizontalControl();
         VerticalControl();
     }
 
-    private void FixedUpdate() {
+    private void FixedUpdate()
+    {
 
-        if(IS_ACCELERATE){
+        if (IS_ACCELERATE)
+        {
             rb.AddForce(jetModelGOB.forward * acceleration * verticalInput, ForceMode.Acceleration);
         }
-        
+
     }
 
-    private void HorizontalControl(){
+    private void StickToGround()
+    {
+        Ray ray = new Ray(transform.position + groundOffset, Vector3.down);
+
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, 1.0f))
+        {
+            jetModelGOB.up = hit.normal;
+        }
+        else
+        {
+            jetModelGOB.up = Vector3.up;
+        }
+
+        jetModelGOB.Rotate(new Vector3(0,curYRot,0),Space.Self);
+    }
+
+    private void HorizontalControl()
+    {
         horizontalInput = Input.GetAxisRaw("Horizontal");
         IS_TURN = horizontalInput != 0 ? true : false;
 

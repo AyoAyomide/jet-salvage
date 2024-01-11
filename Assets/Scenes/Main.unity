@@ -459,7 +459,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 382723055}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.360318, y: -0, z: -0, w: 0.93282956}
+  m_LocalRotation: {x: 0.123606145, y: -0, z: -0, w: 0.9923314}
   m_LocalPosition: {x: 0, y: 2.5284102, z: -9.24076}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1772,8 +1772,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fc3d4f59260d4b1fbdc79c3be4f001d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceleration: 10
-  turnSpeed: 30
+  acceleration: 30
+  turnSpeed: 60
   jetModelGOB: {fileID: 831776319}
 --- !u!54 &2131133620
 Rigidbody:
