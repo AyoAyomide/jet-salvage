@@ -21,28 +21,28 @@ public class PlayerController : MonoBehaviour
 
     private Vector3 startModelOffset;
 
+    private float turnRate;
+
     private void Start()
     {
-
         rb = gameObject.GetComponent<Rigidbody>();
         startModelOffset = jetModelGOB.transform.localPosition;
     }
 
     private void Update()
     {
+        HorizontalControl();
+        VerticalControl();
 
-        float turnRate = Vector3.Dot(rb.velocity.normalized, jetModelGOB.forward);
+        turnRate = Vector3.Dot(rb.velocity.normalized, jetModelGOB.forward);
         turnRate = Mathf.Abs(turnRate);
 
         curYRot += horizontalInput * turnSpeed * turnRate * Time.deltaTime;
         jetModelGOB.position = transform.position + startModelOffset;
-        //jetModelGOB.eulerAngles = new Vector3(0, curYRot, 0);
 
         StickToGround();
 
 
-        HorizontalControl();
-        VerticalControl();
     }
 
     private void FixedUpdate()
@@ -70,7 +70,14 @@ public class PlayerController : MonoBehaviour
             jetModelGOB.up = Vector3.up;
         }
 
-        jetModelGOB.Rotate(new Vector3(0,curYRot,0),Space.Self);
+        // Interpolate between the current rotation and the target rotation
+         Quaternion targetRotation = Quaternion.Euler(0, curYRot, 0);
+         Quaternion upRotation = Quaternion.Lerp(jetModelGOB.rotation, targetRotation, turnSpeed * Time.deltaTime);
+
+        // Extract the Y rotation from the interpolated rotation and apply it to jetModelGOB
+        jetModelGOB.Rotate(new Vector3(0, upRotation.eulerAngles.y, 0), Space.Self);
+
+        //jetModelGOB.Rotate(new Vector3(0, curYRot, 0), Space.Self);
     }
 
     private void HorizontalControl()
