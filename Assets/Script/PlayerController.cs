@@ -38,7 +38,7 @@ public class PlayerController : MonoBehaviour
         turnRate = Mathf.Abs(turnRate);
 
         curYRot += horizontalInput * turnSpeed * turnRate * Time.deltaTime;
-        jetModelGOB.position = transform.position + startModelOffset;
+        // jetModelGOB.position = transform.position + startModelOffset;
 
         StickToGround();
 
@@ -70,19 +70,13 @@ public class PlayerController : MonoBehaviour
             jetModelGOB.up = Vector3.up;
         }
 
-        // Interpolate between the current rotation and the target rotation
-         Quaternion targetRotation = Quaternion.Euler(0, curYRot, 0);
-         Quaternion upRotation = Quaternion.Lerp(jetModelGOB.rotation, targetRotation, turnSpeed * Time.deltaTime);
-
-        // Extract the Y rotation from the interpolated rotation and apply it to jetModelGOB
-        jetModelGOB.Rotate(new Vector3(0, upRotation.eulerAngles.y, 0), Space.Self);
-
-        //jetModelGOB.Rotate(new Vector3(0, curYRot, 0), Space.Self);
+        jetModelGOB.rotation *= Quaternion.Euler(0f, curYRot, 0f);
+       //jetModelGOB.Rotate(new Vector3(0, curYRot, 0), Space.Self);
     }
 
     private void HorizontalControl()
     {
-        horizontalInput = Input.GetAxisRaw("Horizontal");
+        horizontalInput = Input.GetAxis("Horizontal");
         IS_TURN = horizontalInput != 0 ? true : false;
 
         Debug.Log("move left");
@@ -90,7 +84,7 @@ public class PlayerController : MonoBehaviour
     private void VerticalControl()
     {
         // Get vertical input
-        verticalInput = Input.GetAxisRaw("Vertical");
+        verticalInput = Input.GetAxis("Vertical");
         IS_ACCELERATE = verticalInput != 0 ? true : false;
 
         Debug.Log("move forward");
