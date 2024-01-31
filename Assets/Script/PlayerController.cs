@@ -1,56 +1,51 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] float acceleration;
-    [SerializeField] float turnSpeed;
-    [SerializeField] Transform jetModelGOB;
-    [SerializeField] Vector3 groundOffset;
-
+    [SerializeField] Vector3 moveDir;
+    [SerializeField] float moveSpeed;
+    [SerializeField] float fallSpeed;
+    [SerializeField] Vector3 testRot;
+    [SerializeField] float rotateSpeed;
+    [SerializeField] float rotateAmount;
+    [SerializeField] Transform fTarget;
+    private Vector3 groundOffset = new Vector3(0, -0.83f, 0);
     private Rigidbody rb;
-
-    private float curYRot;
 
     private float horizontalInput;
     private float verticalInput;
 
-    private bool IS_ACCELERATE;
-    private bool IS_TURN;
-
-    private Vector3 startModelOffset;
-
-    private float turnRate;
 
     private void Start()
     {
-        rb = gameObject.GetComponent<Rigidbody>();
-        startModelOffset = jetModelGOB.transform.localPosition;
+        rb = GetComponent<Rigidbody>();
     }
-
     private void Update()
     {
-        HorizontalControl();
-        VerticalControl();
-
-        turnRate = Vector3.Dot(rb.velocity.normalized, jetModelGOB.forward);
-        turnRate = Mathf.Abs(turnRate);
-
-        curYRot += horizontalInput * turnSpeed * turnRate * Time.deltaTime;
-        // jetModelGOB.position = transform.position + startModelOffset;
+        InputDirection();
 
         StickToGround();
 
+        RotatePlayer();
 
     }
 
     private void FixedUpdate()
     {
+        float zPos = verticalInput * moveSpeed;
+        float xPos = horizontalInput * moveSpeed;
 
-        if (IS_ACCELERATE)
+
+
+
+
+        if (verticalInput != 0 || horizontalInput != 0)
         {
-            rb.AddForce(jetModelGOB.forward * acceleration * verticalInput, ForceMode.Acceleration);
+              rb.AddForce(xPos, 0, zPos, ForceMode.Impulse);
+
         }
 
     }
@@ -58,35 +53,34 @@ public class PlayerController : MonoBehaviour
     private void StickToGround()
     {
         Ray ray = new Ray(transform.position + groundOffset, Vector3.down);
-
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, 1.0f))
+        if (Physics.Raycast(ray, out hit, 1.0f)) // player is on a surface
         {
-            jetModelGOB.up = hit.normal;
+            Debug.Log("ray hit something");
         }
-        else
+        else // player is floating
         {
-            jetModelGOB.up = Vector3.up;
+            rb.AddForce(Vector3.down * fallSpeed, ForceMode.Force);
+            Debug.Log("ray not hitting");
         }
-
-        jetModelGOB.rotation *= Quaternion.Euler(0f, curYRot, 0f);
-       //jetModelGOB.Rotate(new Vector3(0, curYRot, 0), Space.Self);
     }
 
-    private void HorizontalControl()
+    private void RotatePlayer()
+    {
+        //  if (horizontalInput != 0)
+        //  {
+        float yDeg = Mathf.MoveTowardsAngle(transform.rotation.y, horizontalInput * rotateAmount, rotateSpeed);
+
+       // transform.rotation = Quaternion.Euler(0, yDeg, 0);
+        //   }
+    }
+
+    private void InputDirection()
     {
         horizontalInput = Input.GetAxis("Horizontal");
-        IS_TURN = horizontalInput != 0 ? true : false;
 
-        Debug.Log("move left");
-    }
-    private void VerticalControl()
-    {
-        // Get vertical input
         verticalInput = Input.GetAxis("Vertical");
-        IS_ACCELERATE = verticalInput != 0 ? true : false;
-
-        Debug.Log("move forward");
     }
+
 }
