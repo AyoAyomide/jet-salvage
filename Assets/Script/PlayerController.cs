@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cinemachine;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -8,11 +9,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Vector3 moveDir;
     [SerializeField] float moveSpeed;
     [SerializeField] float fallSpeed;
-    [SerializeField] Vector3 testRot;
-    [SerializeField] float rotateSpeed;
     [SerializeField] float rotateAmount;
     [SerializeField] Transform fTarget;
-    private Vector3 groundOffset = new Vector3(0, -0.83f, 0);
+    [SerializeField] Transform jetModelGOB;
+    [SerializeField] CinemachineVirtualCamera vCam;
+    [SerializeField] Vector3 groundOffset = new Vector3(0, -0.83f, 0);
     private Rigidbody rb;
 
     private float horizontalInput;
@@ -27,26 +28,31 @@ public class PlayerController : MonoBehaviour
     {
         InputDirection();
 
-        StickToGround();
 
-        RotatePlayer();
+
 
     }
 
     private void FixedUpdate()
     {
+        StickToGround();
+
+        DutchCamera();
+
         float zPos = verticalInput * moveSpeed;
         float xPos = horizontalInput * moveSpeed;
 
-
-
-
-
-        if (verticalInput != 0 || horizontalInput != 0)
+        if (Mathf.Abs(verticalInput) > 0.1f || Mathf.Abs(horizontalInput) > 0.1f)
         {
-              rb.AddForce(xPos, 0, zPos, ForceMode.Impulse);
-
+            Vector3 force = new Vector3(xPos, 0, zPos);
+            rb.AddForce(force, ForceMode.Acceleration);
         }
+
+        //if (verticalInput != 0 || horizontalInput != 0)
+        //  {
+        //   rb.AddForce(xPos, 0, zPos, ForceMode.Impulse);
+        // rb.AddForce(transform.forward * moveSpeed * verticalInput, ForceMode.Acceleration);
+        //}
 
     }
 
@@ -57,23 +63,20 @@ public class PlayerController : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit, 1.0f)) // player is on a surface
         {
+            jetModelGOB.up = hit.normal;
             Debug.Log("ray hit something");
         }
         else // player is floating
         {
+            jetModelGOB.up = Vector3.up;
             rb.AddForce(Vector3.down * fallSpeed, ForceMode.Force);
             Debug.Log("ray not hitting");
         }
     }
 
-    private void RotatePlayer()
+    private void DutchCamera()
     {
-        //  if (horizontalInput != 0)
-        //  {
-        float yDeg = Mathf.MoveTowardsAngle(transform.rotation.y, horizontalInput * rotateAmount, rotateSpeed);
-
-       // transform.rotation = Quaternion.Euler(0, yDeg, 0);
-        //   }
+        vCam.m_Lens.Dutch = horizontalInput * rotateAmount;
     }
 
     private void InputDirection()
