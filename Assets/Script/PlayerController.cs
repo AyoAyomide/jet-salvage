@@ -14,10 +14,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Transform jetModelGOB;
     [SerializeField] CinemachineVirtualCamera vCam;
     [SerializeField] Vector3 groundOffset = new Vector3(0, -0.83f, 0);
+
+    [SerializeField] GameObject projectilePrefab;
+    [SerializeField] Transform sourceOne;
+    [SerializeField] Transform sourceTwo;
     private Rigidbody rb;
 
     private float horizontalInput;
     private float verticalInput;
+
+    
 
 
     private void Start()
@@ -28,18 +34,22 @@ public class PlayerController : MonoBehaviour
     {
         InputDirection();
 
-
-
-
+          //Single shoot
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+           // camAnim.Play(camAnim.clip.name);
+            Instantiate(projectilePrefab, sourceOne.position, sourceOne.rotation);
+            Instantiate(projectilePrefab, sourceTwo.position, sourceTwo.rotation);
+        }
     }
 
     private void FixedUpdate()
     {
-        StickToGround();
+       StickToGround();
 
         DutchCamera();
 
-        float zPos = verticalInput * moveSpeed;
+        float zPos = verticalInput < 0 ? verticalInput * (moveSpeed / 2) : verticalInput * moveSpeed;
         float xPos = horizontalInput * moveSpeed;
 
         if (Mathf.Abs(verticalInput) > 0.1f || Mathf.Abs(horizontalInput) > 0.1f)
