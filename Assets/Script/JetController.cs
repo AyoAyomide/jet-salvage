@@ -4,20 +4,22 @@ public class JetController : MonoBehaviour
 {
     [SerializeField] float moveSpeed;
     [SerializeField] float rotateSpeed;
+    [SerializeField] float fallSpeed;
+    [SerializeField] float alignSpeed;
+    [SerializeField] Transform jetModelGOB;
+    [SerializeField] GameObject playerHolder;
+    [SerializeField] Vector3 groundOffset = new Vector3(0, -0.6f, 0);
 
     private Rigidbody rb;
     private float horizontalInput;
     private float verticalInput;
     private float yRot;
-    public Vector3 moveDir;
-
-
+    private Vector3 moveDir;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
-
-
+        playerHolder.transform.position = new Vector3(0, -0.45f, 0);
 
     }
     private void Update()
@@ -33,8 +35,8 @@ public class JetController : MonoBehaviour
         }
         yRot = transform.eulerAngles.y;
 
+        StickToGround(jetModelGOB, alignSpeed, rb);
     }
-
     private void FixedUpdate()
     {
         moveDir = transform.forward * verticalInput + transform.right * horizontalInput;
@@ -54,4 +56,28 @@ public class JetController : MonoBehaviour
 
         verticalInput = Input.GetAxis("Vertical");
     }
+    private void StickToGround(Transform objectToStick, float alignSpeed, Rigidbody objectToStickRB = null)
+    {
+        Ray ray = new Ray(transform.position + groundOffset, Vector3.down);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, 1.0f)) // player is on a surface
+        {
+            objectToStick.up = Vector3.Lerp(objectToStick.up, hit.normal, alignSpeed * Time.deltaTime);
+
+            if (hit.collider.gameObject.name == "Ground")
+            {
+                objectToStick.localEulerAngles = Vector3.Lerp(objectToStick.up, Vector3.zero, alignSpeed * Time.deltaTime);
+            }
+        }
+        else
+        {
+            if (objectToStickRB)
+            {
+                rb.AddForce(Vector3.down * fallSpeed, ForceMode.Force);
+
+            }
+        }
+    }
+
 }
