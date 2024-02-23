@@ -1,16 +1,24 @@
 using UnityEngine;
-using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
+    public enum GameStates
+    {
+        Playing,
+        Failed,
+        Passed
+    }
+    public GameStates gameState;
+
+    [SerializeField] GameObject gameFailedUI;
 
     private void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
     }
-
     public void StickToGround(Transform objectToStick, float alignSpeed, Vector3 groundOffset, Rigidbody objectToStickRB = null, float fallSpeed = 0)
     {
         Ray ray = new Ray(transform.position + groundOffset, Vector3.down);
@@ -35,4 +43,14 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void GameOver(){
+        gameFailedUI.SetActive(true);
+        gameState = GameStates.Failed;
+    }
+    public void Restart(){
+        SceneManager.LoadScene("Main");
+    }
+    public void Passed(){
+
+    }
 }

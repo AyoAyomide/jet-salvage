@@ -27,19 +27,18 @@ public class EnemyController : MonoBehaviour
         {
             objectToStick.up = Vector3.Lerp(objectToStick.up, hit.normal, alignSpeed * Time.deltaTime);
 
-            if (hit.collider.gameObject.name == "Ground")
-            {
-                objectToStick.localEulerAngles = Vector3.Lerp(objectToStick.up, Vector3.zero, alignSpeed * Time.deltaTime);
-            }
         }
         else
         {
-            // if (objectToStickRB)
-            // {
-            //     rb.AddForce(Vector3.down * fallSpeed, ForceMode.Force);
-
-            // }
+            objectToStick.localRotation = Quaternion.identity;
         }
     }
 
+    private void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            GameManager.Instance.GameOver();
+        }
+    }
 }

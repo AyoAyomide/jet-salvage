@@ -52,9 +52,17 @@ public class JetController : MonoBehaviour
     }
     private void InputDirection()
     {
-        horizontalInput = Input.GetAxis("Horizontal");
+        if (GameManager.Instance.gameState == GameManager.GameStates.Playing)
+        {
+            horizontalInput = Input.GetAxis("Horizontal");
 
-        verticalInput = Input.GetAxis("Vertical");
+            verticalInput = Input.GetAxis("Vertical");
+        }
+        else
+        {
+            horizontalInput = verticalInput = 0f;
+        }
+
     }
     private void StickToGround(Transform objectToStick, float alignSpeed, Rigidbody objectToStickRB = null)
     {
